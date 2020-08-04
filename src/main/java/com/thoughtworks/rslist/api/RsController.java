@@ -15,7 +15,7 @@ public class RsController {
     initRsEventList();
   }
 
-  private List<RsEvent> initRsEventList() {
+  public List<RsEvent> initRsEventList() {
     rsList = new ArrayList<>();
     rsList.add(new RsEvent("第一条事件", "无标签"));
     rsList.add(new RsEvent("第二条事件", "无标签"));
@@ -50,5 +50,10 @@ public class RsController {
       event.setEventName(rsEvent.getEventName());
     if (updateKeyWord != null)
       event.setKeyWord(rsEvent.getKeyWord());
+  }
+
+  @DeleteMapping("rs/delete/{index}")
+  public void deleteRsEvent(@PathVariable int index) {
+    rsList.remove(index - 1);
   }
 }

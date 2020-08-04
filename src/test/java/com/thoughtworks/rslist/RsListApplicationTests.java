@@ -1,12 +1,18 @@
 package com.thoughtworks.rslist;
 
 
+import com.thoughtworks.rslist.api.RsController;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockHttpSession;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MockMvcBuilder;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
@@ -17,7 +23,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 class RsListApplicationTests {
     @Autowired
-    MockMvc mockMvc;
+    private MockMvc mockMvc;
+
+    @Autowired
+    private RsController rsController;
+
+    @BeforeEach
+    public void setUpController() {
+        rsController.initRsEventList();
+    }
 
     @Test
     public void get_rs_event_list() throws Exception {
@@ -138,6 +152,29 @@ class RsListApplicationTests {
                 .andExpect(jsonPath("$[2].keyWord",is("无标签")))
                 .andExpect(status().isOk());
 
+    }
+
+    @Test
+    public void should_delete_rs_event() throws Exception {
+        mockMvc.perform(get("/rs/list"))
+                .andExpect(jsonPath("$", hasSize(3)))
+                .andExpect(jsonPath("$[0].eventName", is("第一条事件")))
+                .andExpect(jsonPath("$[0].keyWord",is("无标签")))
+                .andExpect(jsonPath("$[1].eventName",is("第二条事件")))
+                .andExpect(jsonPath("$[1].keyWord",is("无标签")))
+                .andExpect(jsonPath("$[2].eventName",is("第三条事件")))
+                .andExpect(jsonPath("$[2].keyWord", is("无标签")))
+                .andExpect(status().isOk());
+
+        mockMvc.perform(delete("/rs/delete/2")).andExpect(status().isOk());
+
+        mockMvc.perform(get("/rs/list"))
+                .andExpect(jsonPath("$", hasSize(2)))
+                .andExpect(jsonPath("$[0].eventName", is("第一条事件")))
+                .andExpect(jsonPath("$[0].keyWord",is("无标签")))
+                .andExpect(jsonPath("$[1].eventName",is("第三条事件")))
+                .andExpect(jsonPath("$[1].keyWord",is("无标签")))
+                .andExpect(status().isOk());
     }
 
 }
