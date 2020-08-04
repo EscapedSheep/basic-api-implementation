@@ -104,4 +104,40 @@ class RsListApplicationTests {
 
     }
 
+    @Test
+    public void should_update_rs_event_name() throws Exception {
+        String jsonStr = "{\"eventName\":\"猪肉涨价啦\"}";
+        mockMvc.perform(put("/rs/update/2").content(jsonStr).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+        mockMvc.perform(get("/rs/list"))
+                .andExpect(jsonPath("$", hasSize(3)))
+                .andExpect(jsonPath("$[0].eventName",is("第一条事件")))
+                .andExpect(jsonPath("$[0].keyWord",is("无标签")))
+                .andExpect(jsonPath("$[1].eventName",is("猪肉涨价啦")))
+                .andExpect(jsonPath("$[1].keyWord",is("无标签")))
+                .andExpect(jsonPath("$[2].eventName",is("第三条事件")))
+                .andExpect(jsonPath("$[2].keyWord",is("无标签")))
+                .andExpect(status().isOk());
+
+    }
+
+    @Test
+    public void should_update_rs_event_key_word() throws Exception {
+        String jsonStr = "{\"keyWord\":\"经济\"}";
+        mockMvc.perform(put("/rs/update/2").content(jsonStr).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+        mockMvc.perform(get("/rs/list"))
+                .andExpect(jsonPath("$", hasSize(3)))
+                .andExpect(jsonPath("$[0].eventName",is("第一条事件")))
+                .andExpect(jsonPath("$[0].keyWord",is("无标签")))
+                .andExpect(jsonPath("$[1].eventName",is("第二条事件")))
+                .andExpect(jsonPath("$[1].keyWord",is("经济")))
+                .andExpect(jsonPath("$[2].eventName",is("第三条事件")))
+                .andExpect(jsonPath("$[2].keyWord",is("无标签")))
+                .andExpect(status().isOk());
+
+    }
+
 }

@@ -44,7 +44,11 @@ public class RsController {
   @PutMapping("/rs/update/{index}")
   public void updateRsEvent(@RequestBody RsEvent rsEvent, @PathVariable int index) {
     RsEvent event = rsList.get(index - 1);
-    event.setEventName(rsEvent.getEventName());
-    event.setKeyWord(rsEvent.getKeyWord());
+    String updateName = rsEvent.getEventName();
+    String updateKeyWord = rsEvent.getKeyWord();
+    if (updateName != null)
+      event.setEventName(rsEvent.getEventName());
+    if (updateKeyWord != null)
+      event.setKeyWord(rsEvent.getKeyWord());
   }
 }
