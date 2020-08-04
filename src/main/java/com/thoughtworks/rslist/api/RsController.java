@@ -40,4 +40,11 @@ public class RsController {
   public void addRsEvent(@RequestBody RsEvent rsEvent) {
     rsList.add(rsEvent);
   }
+
+  @PutMapping("/rs/update/{index}")
+  public void updateRsEvent(@RequestBody RsEvent rsEvent, @PathVariable int index) {
+    RsEvent event = rsList.get(index - 1);
+    event.setEventName(rsEvent.getEventName());
+    event.setKeyWord(rsEvent.getKeyWord());
+  }
 }
