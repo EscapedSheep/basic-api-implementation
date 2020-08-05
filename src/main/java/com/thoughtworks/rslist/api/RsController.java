@@ -1,6 +1,7 @@
 package com.thoughtworks.rslist.api;
 
 import com.thoughtworks.rslist.Exception.InvalidIndexException;
+import com.thoughtworks.rslist.Exception.InvalidRequestParamException;
 import com.thoughtworks.rslist.domain.RsEvent;
 import com.thoughtworks.rslist.service.RsService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +29,9 @@ public class RsController {
 
   @GetMapping("/rs/list")
   public ResponseEntity getRsEventBetween(@RequestParam(required = false) Integer start, @RequestParam(required = false) Integer end) {
+    if (start < 1 || end > rsService.getRsNumber())
+      throw new InvalidRequestParamException();
+
     if (start != null && end != null) {
       return ResponseEntity.ok(rsService.getRsEventBetween(start, end));
     }
