@@ -1,62 +1,51 @@
 package com.thoughtworks.rslist.api;
 
 import com.thoughtworks.rslist.domain.RsEvent;
-import com.thoughtworks.rslist.domain.User;
+import com.thoughtworks.rslist.service.RsService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.ArrayList;
-import java.util.List;
 
 @RestController
 public class RsController {
 
-  private List<RsEvent> rsList = initRsEventList();
+  private RsService rsService;
 
-  private List<RsEvent> initRsEventList() {
-    User user = new User("xiaowang", "female", 19, "18888888888", "a@thoughtworks.com");
-    rsList = new ArrayList<>();
-    rsList.add(new RsEvent("第一条事件", "无标签", user));
-    rsList.add(new RsEvent("第二条事件", "无标签", user));
-    rsList.add(new RsEvent("第三条事件", "无标签", user));
-    return rsList;
+  @Autowired
+  public RsController(RsService rsService) {
+    this.rsService = rsService;
   }
 
   @GetMapping("/rs/{index}")
   public ResponseEntity getRsEvent(@PathVariable int index) {
-    return ResponseEntity.ok(rsList.get(index - 1));
+    return ResponseEntity.ok(rsService.getRsEvent(index ));
   }
 
   @GetMapping("/rs/list")
   public ResponseEntity getRsEventBetween(@RequestParam(required = false) Integer start, @RequestParam(required = false) Integer end) {
     if (start != null && end != null) {
-      return ResponseEntity.ok(rsList.subList(start - 1, end));
+      return ResponseEntity.ok(rsService.getRsEventBetween(start, end));
     }
-    return ResponseEntity.ok(rsList);
+    return ResponseEntity.ok(rsService.getRsEventList());
   }
 
   @PostMapping("/rs/event")
   public ResponseEntity addRsEvent(@RequestBody @Valid RsEvent rsEvent) {
-    rsList.add(rsEvent);
+    rsService.addRsEvent(rsEvent);
     return ResponseEntity.created(null).build();
   }
 
   @PutMapping("/rs/{index}")
   public ResponseEntity updateEvent(@RequestBody RsEvent rsEvent, @PathVariable int index) {
-    RsEvent event = rsList.get(index - 1);
-    String updateName = rsEvent.getEventName();
-    String updateKeyWord = rsEvent.getKeyWord();
-    if (updateName != null)
-      event.setEventName(rsEvent.getEventName());
-    if (updateKeyWord != null)
-      event.setKeyWord(rsEvent.getKeyWord());
+    rsService.updateRsEvent(rsEvent, index);
     return ResponseEntity.ok(null);
   }
 
   @DeleteMapping("rs/{index}")
   public ResponseEntity deleteRsEvent(@PathVariable int index) {
-    rsList.remove(index - 1);
+    rsService.deleteRsEvent(index);
     return ResponseEntity.ok(null);
   }
 }
