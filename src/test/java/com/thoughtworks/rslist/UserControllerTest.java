@@ -131,6 +131,17 @@ public class UserControllerTest {
                 .andExpect(status().isOk());
     }
 
+    @Order(11)
+    @Test
+    public void should_return_invalid_user_error() throws Exception {
+        User user = getTestUser();
+        user.setAge(10000);
+        String userJson = getUserJson(user);
+        mockMvc.perform(post("/user").content(userJson).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.error", is("invalid user")))
+                .andExpect(status().isBadRequest());
+    }
+
     private User getTestUser() {
         User user = new User("maida", "male", 99, "18888888888", "email@gmail.com");
         return user;

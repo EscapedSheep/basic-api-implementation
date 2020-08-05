@@ -29,10 +29,9 @@ public class RsController {
 
   @GetMapping("/rs/list")
   public ResponseEntity getRsEventBetween(@RequestParam(required = false) Integer start, @RequestParam(required = false) Integer end) {
-    if (start < 1 || end > rsService.getRsNumber())
-      throw new InvalidRequestParamException();
-
     if (start != null && end != null) {
+      if (start < 1 || end > rsService.getRsNumber())
+        throw new InvalidRequestParamException();
       return ResponseEntity.ok(rsService.getRsEventBetween(start, end));
     }
     return ResponseEntity.ok(rsService.getRsEventList());
@@ -48,6 +47,7 @@ public class RsController {
   public ResponseEntity updateEvent(@RequestBody RsEvent rsEvent, @PathVariable int index) {
     if (index < 1 || index > rsService.getRsNumber())
       throw new InvalidIndexException();
+    rsService.updateRsEvent(rsEvent,index);
     return ResponseEntity.ok(null);
   }
 

@@ -272,6 +272,16 @@ class RsControllerTest {
                 .andExpect(status().isBadRequest());
     }
 
+    @Order(14)
+    @Test
+    public void should_return_invalid_param_error() throws Exception {
+        String jsonStr = "{\"eventName\": \"猪肉涨价啦\", \"keyWord\": \"经济\", \"user\": {\"userName\": \"maidamaidadad\", \"gender\": \"male\", \"age\": 19, \"phone\": \"18888888888\", \"email\": \"a@gmail.com\"}}";
+
+        mockMvc.perform(post("/rs/event").content(jsonStr).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.error", is("invalid param")))
+                .andExpect(status().isBadRequest());
+
+    }
 
 
 
