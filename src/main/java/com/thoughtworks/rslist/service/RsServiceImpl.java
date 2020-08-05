@@ -13,14 +13,14 @@ public class RsServiceImpl implements RsService{
 
     private List<RsEvent> rsEventList;
 
-    private UserServiceImpl userServiceImpl;
+    private UserService userService;
 
     @Autowired
-    public RsServiceImpl(UserServiceImpl userServiceImpl) {
-        this.userServiceImpl = userServiceImpl;
+    public RsServiceImpl(UserService userService) {
+        this.userService = userService;
         rsEventList = new ArrayList<>();
         User user = new User("xiaowang", "female", 19, "18888888888", "a@thoughtworks.com");
-        userServiceImpl.registerUser(user);
+        userService.registerUser(user);
         RsEvent event1 = new RsEvent("第一条事件", "无标签", user);
         RsEvent event2 = new RsEvent("第二条事件", "无标签", user);
         RsEvent event3 = new RsEvent("第三条事件", "无标签", user);
@@ -31,8 +31,10 @@ public class RsServiceImpl implements RsService{
 
     @Override
     public void addRsEvent(RsEvent rsEvent) {
+        User user = rsEvent.getUser();
+        if (!userService.isUserRegistered(user.getUserName()))
+            userService.registerUser(user);
         rsEventList.add(rsEvent);
-
     }
 
     @Override

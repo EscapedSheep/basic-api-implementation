@@ -9,4 +9,6 @@ public interface UserService {
     public void registerUser(User user);
 
     public List<User> getUserList();
+
+    public Boolean isUserRegistered(String name);
 }
