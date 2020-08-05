@@ -244,6 +244,24 @@ class RsControllerTest {
 
     @Order(12)
     @Test
+    public void should_register_user_when_add_rs_event_if_user_name_not_existed() throws Exception{
+        String jsonStr = "{\"eventName\": \"猪肉涨价啦\", \"keyWord\": \"经济\", \"user\": {\"userName\": \"new user\", \"gender\": \"female\", \"age\": 99, \"phone\": \"12345678901\", \"email\": \"a@b.com\"}}";
+
+        mockMvc.perform(post("/rs/event").content(jsonStr).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated());
+
+        mockMvc.perform(get("/users"))
+                .andExpect((jsonPath("$",hasSize(3))))
+                .andExpect(jsonPath("$[2].userName", is("new user")))
+                .andExpect(jsonPath("$[2].gender", is("female")))
+                .andExpect(jsonPath("$[2].age", is(99)))
+                .andExpect(jsonPath("$[2].phone", is("12345678901")))
+                .andExpect(jsonPath("$[2].email", is("a@b.com")))
+                .andExpect(status().isOk());
+    }
+
+    @Order(13)
+    @Test
     public void should_return_invalid_index_error() throws Exception {
         mockMvc.perform(get("/rs/-1"))
                 .andExpect(jsonPath("$.error", is("invalid index")))
@@ -260,7 +278,7 @@ class RsControllerTest {
 
     }
 
-    @Order(13)
+    @Order(14)
     @Test
     public void should_return_invalid_request_param_error() throws Exception {
         mockMvc.perform(get("/rs/list?start=-1&end=2"))
@@ -272,7 +290,7 @@ class RsControllerTest {
                 .andExpect(status().isBadRequest());
     }
 
-    @Order(14)
+    @Order(15)
     @Test
     public void should_return_invalid_param_error() throws Exception {
         String jsonStr = "{\"eventName\": \"猪肉涨价啦\", \"keyWord\": \"经济\", \"user\": {\"userName\": \"maidamaidadad\", \"gender\": \"male\", \"age\": 19, \"phone\": \"18888888888\", \"email\": \"a@gmail.com\"}}";
