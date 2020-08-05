@@ -24,7 +24,7 @@ public class UserControllerTest {
         User user = getTestUser();
         String userJson = getUserJson(user);
         mockMvc.perform(post("/user").content(userJson).contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
+                .andExpect(status().isCreated());
     }
 
     @Test
