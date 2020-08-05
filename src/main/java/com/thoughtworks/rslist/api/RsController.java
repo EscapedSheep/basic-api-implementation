@@ -30,7 +30,7 @@ public class RsController {
 
   @GetMapping("/rs/list")
   public List<RsEvent> getRsEventBetween(@RequestParam(required = false) Integer start, @RequestParam(required = false) Integer end) {
-    if (start != null || end != null) {
+    if (start != null && end != null) {
       return rsList.subList(start - 1, end);
     }
     return rsList;
