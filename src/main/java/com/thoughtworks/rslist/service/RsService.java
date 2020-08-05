@@ -18,4 +18,6 @@ public interface RsService {
 
     public void deleteRsEvent(int index);
 
+    public int getRsNumber();
+
 }

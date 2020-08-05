@@ -1,5 +1,6 @@
 package com.thoughtworks.rslist.api;
 
+import com.thoughtworks.rslist.Exception.InvalidIndexException;
 import com.thoughtworks.rslist.domain.RsEvent;
 import com.thoughtworks.rslist.service.RsService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +21,8 @@ public class RsController {
 
   @GetMapping("/rs/{index}")
   public ResponseEntity getRsEvent(@PathVariable int index) {
+    if (index < 1 || index > rsService.getRsNumber())
+      throw new InvalidIndexException();
     return ResponseEntity.ok(rsService.getRsEvent(index ));
   }
 
@@ -39,12 +42,15 @@ public class RsController {
 
   @PutMapping("/rs/{index}")
   public ResponseEntity updateEvent(@RequestBody RsEvent rsEvent, @PathVariable int index) {
-    rsService.updateRsEvent(rsEvent, index);
+    if (index < 1 || index > rsService.getRsNumber())
+      throw new InvalidIndexException();
     return ResponseEntity.ok(null);
   }
 
   @DeleteMapping("rs/{index}")
   public ResponseEntity deleteRsEvent(@PathVariable int index) {
+    if (index < 1 || index > rsService.getRsNumber())
+      throw new InvalidIndexException();
     rsService.deleteRsEvent(index);
     return ResponseEntity.ok(null);
   }

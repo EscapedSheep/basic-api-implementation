@@ -242,6 +242,24 @@ class RsControllerTest {
                 .andExpect(status().isBadRequest());
     }
 
+    @Order(12)
+    @Test
+    public void should_return_invalid_index_error() throws Exception {
+        mockMvc.perform(get("/rs/-1"))
+                .andExpect(jsonPath("$.error", is("invalid index")))
+                .andExpect(status().isBadRequest());
+
+        String jsonStr = "{\"eventName\": \"猪肉涨价啦\", \"keyWord\": \"经济\", \"user\": {\"userName\": \"maida\", \"gender\": \"male\", \"age\": 19, \"phone\": \"18888888888\", \"email\": \"a@gmail.com\"}}";
+        mockMvc.perform(put("/rs/999999").content(jsonStr).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.error", is("invalid index")))
+                .andExpect(status().isBadRequest());
+
+        mockMvc.perform(delete("/rs/-100"))
+                .andExpect(jsonPath("$.error", is("invalid index")))
+                .andExpect(status().isBadRequest());
+
+    }
+
 
 
 

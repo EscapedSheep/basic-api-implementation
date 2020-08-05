@@ -65,4 +65,9 @@ public class RsServiceImpl implements RsService{
     public void deleteRsEvent(int index) {
         rsEventList.remove(index - 1);
     }
+
+    @Override
+    public int getRsNumber() {
+        return rsEventList.size();
+    }
 }
