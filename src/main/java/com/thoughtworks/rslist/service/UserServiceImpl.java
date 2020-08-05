@@ -17,8 +17,9 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    public void registerUser(User user) {
+    public int registerUser(User user) {
         userList.add(user);
+        return userList.size() - 1;
     }
 
     @Override

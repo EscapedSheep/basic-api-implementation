@@ -30,11 +30,13 @@ public class RsServiceImpl implements RsService{
     }
 
     @Override
-    public void addRsEvent(RsEvent rsEvent) {
+    public int addRsEvent(RsEvent rsEvent) {
         User user = rsEvent.getUser();
         if (!userService.isUserRegistered(user.getUserName()))
             userService.registerUser(user);
         rsEventList.add(rsEvent);
+        return rsEventList.size() -1;
+
     }
 
     @Override

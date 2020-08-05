@@ -39,8 +39,8 @@ public class RsController {
 
   @PostMapping("/rs/event")
   public ResponseEntity addRsEvent(@RequestBody @Valid RsEvent rsEvent) {
-    rsService.addRsEvent(rsEvent);
-    return ResponseEntity.created(null).build();
+    int index = rsService.addRsEvent(rsEvent);
+    return ResponseEntity.created(null).header("index", String.valueOf(index)).build();
   }
 
   @PutMapping("/rs/{index}")

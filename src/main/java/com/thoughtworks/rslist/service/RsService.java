@@ -6,7 +6,7 @@ import java.util.List;
 
 public interface RsService {
 
-    public void addRsEvent(RsEvent rsEvent);
+    public int addRsEvent(RsEvent rsEvent);
 
     public List<RsEvent> getRsEventList();
 
