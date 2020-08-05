@@ -1,6 +1,7 @@
 package com.thoughtworks.rslist.api;
 
 import com.thoughtworks.rslist.domain.RsEvent;
+import com.thoughtworks.rslist.domain.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,10 +17,11 @@ public class RsController {
   }
 
   public List<RsEvent> initRsEventList() {
+    User user = new User("xiaowang", "female", 19, "18888888888", "a@thoughtworks.com");
     rsList = new ArrayList<>();
-    rsList.add(new RsEvent("第一条事件", "无标签"));
-    rsList.add(new RsEvent("第二条事件", "无标签"));
-    rsList.add(new RsEvent("第三条事件", "无标签"));
+    rsList.add(new RsEvent("第一条事件", "无标签", user));
+    rsList.add(new RsEvent("第二条事件", "无标签", user));
+    rsList.add(new RsEvent("第三条事件", "无标签", user));
     return rsList;
   }
 
