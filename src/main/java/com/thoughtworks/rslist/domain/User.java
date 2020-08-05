@@ -15,6 +15,7 @@ public class User {
     @Max(100)
     private int age;
 
+    @NotNull
     @Pattern(regexp = "1\\d{10}")
     private String phone;
 

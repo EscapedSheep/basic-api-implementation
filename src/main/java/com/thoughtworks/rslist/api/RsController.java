@@ -2,21 +2,19 @@ package com.thoughtworks.rslist.api;
 
 import com.thoughtworks.rslist.domain.RsEvent;
 import com.thoughtworks.rslist.domain.User;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
 
 @RestController
 public class RsController {
-  private List<RsEvent> rsList;
 
-  public RsController() {
-    initRsEventList();
-  }
+  private List<RsEvent> rsList = initRsEventList();
 
-  public List<RsEvent> initRsEventList() {
+  private List<RsEvent> initRsEventList() {
     User user = new User("xiaowang", "female", 19, "18888888888", "a@thoughtworks.com");
     rsList = new ArrayList<>();
     rsList.add(new RsEvent("第一条事件", "无标签", user));
@@ -26,24 +24,25 @@ public class RsController {
   }
 
   @GetMapping("/rs/{index}")
-  public RsEvent getRsEvent(@PathVariable int index) {
-    return rsList.get(index - 1);
+  public ResponseEntity getRsEvent(@PathVariable int index) {
+    return ResponseEntity.ok(rsList.get(index - 1));
   }
 
   @GetMapping("/rs/list")
-  public List<RsEvent> getRsEventBetween(@RequestParam(required = false) Integer start, @RequestParam(required = false) Integer end) {
+  public ResponseEntity getRsEventBetween(@RequestParam(required = false) Integer start, @RequestParam(required = false) Integer end) {
     if (start != null && end != null) {
-      return rsList.subList(start - 1, end);
+      return ResponseEntity.ok(rsList.subList(start - 1, end));
     }
-    return rsList;
+    return ResponseEntity.ok(rsList);
   }
 
   @PostMapping("/rs/event")
-  public void addRsEvent(@RequestBody RsEvent rsEvent) {
+  public ResponseEntity addRsEvent(@RequestBody @Valid RsEvent rsEvent) {
     rsList.add(rsEvent);
+    return ResponseEntity.created(null).build();
   }
 
-  @PutMapping("/rs/update/{index}")
+  @PutMapping("/rs/{index}")
   public void updateRsEvent(@RequestBody RsEvent rsEvent, @PathVariable int index) {
     RsEvent event = rsList.get(index - 1);
     String updateName = rsEvent.getEventName();
@@ -54,7 +53,7 @@ public class RsController {
       event.setKeyWord(rsEvent.getKeyWord());
   }
 
-  @DeleteMapping("rs/delete/{index}")
+  @DeleteMapping("rs/{index}")
   public void deleteRsEvent(@PathVariable int index) {
     rsList.remove(index - 1);
   }
