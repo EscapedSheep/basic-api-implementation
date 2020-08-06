@@ -12,6 +12,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import javax.persistence.Table;
 import java.util.List;
 
 import static org.hamcrest.Matchers.hasSize;
@@ -41,7 +42,7 @@ public class UserControllerTest {
         userDto = UserDto.builder().userName("xiaowang").age(19).email("a@b.com").phone("18888888888").gender("male").build();
         userDto = userRepository.save(userDto);
         objectMapper = new ObjectMapper();
-        user = User.builder().userName(userDto.getUserName()).age(userDto.getAge()).email(userDto.getEmail()).gender(userDto.getGender()).phone(userDto.getPhone()).build();
+        user = userDto.toUser();
 
     }
 
@@ -163,7 +164,17 @@ public class UserControllerTest {
                 .andExpect(status().isOk());
         List<UserDto> findUser = userRepository.findAll();
         assertEquals(0,findUser.size());
+    }
 
-        userDto = userRepository.save(userDto);
+    @Test
+    public void should_return_user_given_user_id() throws Exception {
+        int id = userDto.getId();
+        mockMvc.perform(get("/user/" + id))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.user_name", is(userDto.getUserName())))
+                .andExpect(jsonPath("$.user_gender", is(userDto.getGender())))
+                .andExpect(jsonPath("$.user_phone", is(userDto.getPhone())))
+                .andExpect(jsonPath("$.user_email", is(userDto.getEmail())))
+                .andExpect(jsonPath("$.user_age", is(userDto.getAge())));
     }
 }

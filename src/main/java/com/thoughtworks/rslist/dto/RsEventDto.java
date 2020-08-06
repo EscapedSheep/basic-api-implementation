@@ -1,5 +1,6 @@
 package com.thoughtworks.rslist.dto;
 
+import com.thoughtworks.rslist.domain.RsEvent;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -8,7 +9,7 @@ import lombok.NoArgsConstructor;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "rs_event")
+@Table(name = "rsEvent")
 @Data
 @Builder
 @NoArgsConstructor
@@ -23,4 +24,8 @@ public class RsEventDto {
 
     @ManyToOne
     private UserDto userDto;
+
+    public RsEvent toRsEvent() {
+        return RsEvent.builder().eventName(eventName).keyWord(keyWord).user(userDto.toUser()).build();
+    }
 }

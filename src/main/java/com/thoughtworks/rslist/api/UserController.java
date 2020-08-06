@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @RestController
 public class UserController {
@@ -24,8 +25,14 @@ public class UserController {
         return ResponseEntity.created(null).header("index", String.valueOf(index)).build();
     }
 
+    @GetMapping("/user/{id}")
+    public ResponseEntity<User> getUser(@PathVariable int id) {
+        User user = userService.getUser(id);
+        return ResponseEntity.ok(user);
+    }
+
     @GetMapping("/users")
-    public ResponseEntity getUserList() {
+    public ResponseEntity<List<User>> getUserList() {
         return ResponseEntity.ok(userService.getUserList());
     }
 

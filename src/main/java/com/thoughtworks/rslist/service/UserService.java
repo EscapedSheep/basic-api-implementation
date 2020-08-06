@@ -13,4 +13,6 @@ public interface UserService {
     public Boolean isUserRegistered(int id);
 
     public void deleteUser(int id);
+
+    public User getUser(int id);
 }
