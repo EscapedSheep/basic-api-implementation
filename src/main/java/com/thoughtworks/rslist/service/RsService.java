@@ -10,14 +10,15 @@ public interface RsService {
 
     public List<RsEvent> getRsEventList();
 
-    public RsEvent getRsEvent(int index);
+    public RsEvent getRsEvent(int id);
 
     public List<RsEvent> getRsEventBetween(int start, int end);
 
-    public void updateRsEvent(RsEvent rsEvent, int index);
+    public int updateRsEvent(RsEvent rsEvent, int id);
 
-    public void deleteRsEvent(int index);
+    public void deleteRsEvent(int id);
 
     public int getRsNumber();
 
+    public int getMaxId();
 }

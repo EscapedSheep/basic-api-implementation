@@ -1,6 +1,5 @@
 package com.thoughtworks.rslist;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.thoughtworks.rslist.domain.User;
 import com.thoughtworks.rslist.dto.UserDto;
@@ -12,7 +11,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
-import javax.persistence.Table;
 import java.util.List;
 
 import static org.hamcrest.Matchers.hasSize;
@@ -39,11 +37,9 @@ public class UserControllerTest {
     @BeforeEach
     public void setUp(){
         userRepository.deleteAll();
-        userDto = UserDto.builder().userName("xiaowang").age(19).email("a@b.com").phone("18888888888").gender("male").build();
-        userDto = userRepository.save(userDto);
+        user = User.builder().userName("xiaowang").age(19).email("a@b.com").phone("18888888888").gender("male").build();
+        userDto = userRepository.save(user.toUserDto());
         objectMapper = new ObjectMapper();
-        user = userDto.toUser();
-
     }
 
     @Test

@@ -1,76 +1,99 @@
 package com.thoughtworks.rslist.service;
 
 import com.thoughtworks.rslist.domain.RsEvent;
-import com.thoughtworks.rslist.domain.User;
+import com.thoughtworks.rslist.dto.RsEventDto;
+import com.thoughtworks.rslist.dto.UserDto;
+import com.thoughtworks.rslist.repository.RsEventRepository;
+import com.thoughtworks.rslist.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
 
 @Service
 public class RsServiceImpl implements RsService{
 
-    private List<RsEvent> rsEventList;
+    private RsEventRepository rsEventRepository;
 
-    private UserService userService;
+    private UserRepository userRepository;
 
     @Autowired
-    public RsServiceImpl(UserService userService) {
-        this.userService = userService;
-        rsEventList = new ArrayList<>();
-        User user = new User("xiaowang", "female", 19, "18888888888", "a@thoughtworks.com");
-        userService.registerUser(user);
-        RsEvent testEvent1 = new RsEvent("第一条事件", "无标签", user);
-        RsEvent testEvent2 = new RsEvent("第二条事件", "无标签", user);
-        RsEvent testEvent3 = new RsEvent("第三条事件", "无标签", user);
-        addRsEvent(testEvent1);
-        addRsEvent(testEvent2);
-        addRsEvent(testEvent3);
+    public RsServiceImpl(UserRepository userRepository, RsEventRepository rsEventRepository) {
+        this.userRepository = userRepository;
+        this.rsEventRepository = rsEventRepository;
     }
 
     @Override
     public int addRsEvent(RsEvent rsEvent) {
-        rsEventList.add(rsEvent);
-        return rsEventList.size() -1;
-
+        Optional<UserDto> userDto = userRepository.findById(rsEvent.getUserId());
+        if (!userDto.isPresent()) {
+            return -1;
+        }
+        RsEventDto rsEventDto = rsEventRepository.save(rsEvent.toRsEventDto(userDto.get()));
+        return rsEventDto.getId();
     }
 
     @Override
     public List<RsEvent> getRsEventList() {
-        return rsEventList;
+        return rsEventRepository.findAll().stream().map(rsEventDto -> rsEventDto.toRsEvent()).collect(Collectors.toList());
     }
 
     @Override
-    public RsEvent getRsEvent(int index) {
-        return rsEventList.get(index - 1);
+    public RsEvent getRsEvent(int id) {
+        Optional<RsEventDto> rsEventDto = rsEventRepository.findById(id);
+        if(rsEventDto.isPresent()) {
+            return rsEventDto.get().toRsEvent();
+        }
+        return null;
     }
 
     @Override
     public List<RsEvent> getRsEventBetween(int start, int end) {
-        return rsEventList.subList(start-1, end);
+        return rsEventRepository.findAllByIdBetween(start, end)
+                .stream()
+                .map(rsEventDto -> rsEventDto.toRsEvent())
+                .collect(Collectors.toList());
     }
 
     @Override
-    public void updateRsEvent(RsEvent rsEvent, int index) {
-        RsEvent event = rsEventList.get(index - 1);
+    public int updateRsEvent(RsEvent rsEvent, int id) {
+        Optional<RsEventDto> rsEventDto = rsEventRepository.findById(id);
+        if (!rsEventDto.isPresent()) {
+            return -1;
+        }
+        if (rsEventDto.get().getUserDto().getId() != rsEvent.getUserId()) {
+            return -1;
+        }
         String updateName = rsEvent.getEventName();
         String updateKeyWord = rsEvent.getKeyWord();
+        int affectRow = 0;
         if (updateName != null) {
-            event.setEventName(rsEvent.getEventName());
+            affectRow += rsEventRepository.modifyEventNameById(id, updateName);
         }
         if (updateKeyWord != null) {
-            event.setKeyWord(rsEvent.getKeyWord());
+            affectRow += rsEventRepository.modifyKeyWordById(id, updateKeyWord);
         }
+        return affectRow;
     }
 
     @Override
-    public void deleteRsEvent(int index) {
-        rsEventList.remove(index - 1);
+    public void deleteRsEvent(int id) {
+        rsEventRepository.deleteById(id);
     }
 
     @Override
     public int getRsNumber() {
-        return rsEventList.size();
+        return Integer.parseInt(String.valueOf(rsEventRepository.count()));
+    }
+
+    @Override
+    public int getMaxId() {
+        AtomicInteger maxId = new AtomicInteger(0);
+        rsEventRepository.findAll().forEach(rsEventDto -> maxId.set(rsEventDto.getId() > maxId.get() ? rsEventDto.getId() : maxId.get()));
+        return maxId.intValue();
     }
 }

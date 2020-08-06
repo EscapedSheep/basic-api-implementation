@@ -6,11 +6,13 @@ import com.thoughtworks.rslist.domain.RsEvent;
 import com.thoughtworks.rslist.service.RsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
+import java.util.List;
 
 @RestController
+@Validated
 public class RsController {
 
   private RsService rsService;
@@ -20,18 +22,19 @@ public class RsController {
     this.rsService = rsService;
   }
 
-  @GetMapping("/rs/{index}")
-  public ResponseEntity getRsEvent(@PathVariable int index) {
-    if (index < 1 || index > rsService.getRsNumber()) {
+  @GetMapping("/rs/{id}")
+  public ResponseEntity getRsEvent(@PathVariable int id) {
+    RsEvent rsEvent = rsService.getRsEvent(id);
+    if (rsEvent == null) {
       throw new InvalidIndexException();
     }
-    return ResponseEntity.ok(rsService.getRsEvent(index ));
+    return ResponseEntity.ok(rsEvent);
   }
 
   @GetMapping("/rs/list")
-  public ResponseEntity getRsEventBetween(@RequestParam(required = false) Integer start, @RequestParam(required = false) Integer end) {
+  public ResponseEntity<List<RsEvent>> getRsEventBetween(@RequestParam(required = false) Integer start, @RequestParam(required = false) Integer end) {
     if (start != null && end != null) {
-      if (start < 1 || end > rsService.getRsNumber()) {
+      if (start < 1 || end > rsService.getMaxId()) {
         throw new InvalidRequestParamException();
       }
       return ResponseEntity.ok(rsService.getRsEventBetween(start, end));
@@ -40,17 +43,21 @@ public class RsController {
   }
 
   @PostMapping("/rs/event")
-  public ResponseEntity addRsEvent(@RequestBody @Valid RsEvent rsEvent) {
-    int index = rsService.addRsEvent(rsEvent);
-    return ResponseEntity.created(null).header("index", String.valueOf(index)).build();
+  public ResponseEntity addRsEvent(@RequestBody RsEvent rsEvent) {
+    int id = rsService.addRsEvent(rsEvent);
+    if (id == -1) {
+      return ResponseEntity.badRequest().build();
+    }
+
+    return ResponseEntity.created(null).header("id", String.valueOf(id)).build();
   }
 
-  @PutMapping("/rs/{index}")
-  public ResponseEntity updateEvent(@RequestBody RsEvent rsEvent, @PathVariable int index) {
-    if (index < 1 || index > rsService.getRsNumber()) {
-      throw new InvalidIndexException();
+  @PutMapping("/rs/{id}")
+  public ResponseEntity updateEvent(@RequestBody RsEvent rsEvent, @PathVariable int id) {
+    int affectRow = rsService.updateRsEvent(rsEvent,id);
+    if (affectRow < 1) {
+      return ResponseEntity.badRequest().build();
     }
-    rsService.updateRsEvent(rsEvent,index);
     return ResponseEntity.ok(null);
   }
 

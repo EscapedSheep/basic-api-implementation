@@ -30,11 +30,6 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    public Boolean isUserRegistered(int id) {
-        return userRepository.findById(id).isPresent();
-    }
-
-    @Override
     public void deleteUser(int id) {
         userRepository.deleteById(id);
     }

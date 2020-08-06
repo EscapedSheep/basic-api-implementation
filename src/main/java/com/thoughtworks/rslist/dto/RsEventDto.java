@@ -26,6 +26,6 @@ public class RsEventDto {
     private UserDto userDto;
 
     public RsEvent toRsEvent() {
-        return RsEvent.builder().eventName(eventName).keyWord(keyWord).user(userDto.toUser()).build();
+        return RsEvent.builder().eventName(eventName).keyWord(keyWord).userId(userDto.getId()).rsEventId(id).build();
     }
 }

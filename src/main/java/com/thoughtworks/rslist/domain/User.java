@@ -1,6 +1,5 @@
 package com.thoughtworks.rslist.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.thoughtworks.rslist.dto.UserDto;
 import lombok.AllArgsConstructor;
@@ -32,16 +31,11 @@ public class User {
     @Email
     private String email;
 
-    private int votes;
+    @Builder.Default
+    private int votes = 10;
 
-    public User(String userName, String gender, int age, String phone, String email) {
-        this.userName = userName;
-        this.gender = gender;
-        this.age = age;
-        this.phone = phone;
-        this.email = email;
-        this.votes = 10;
-    }
+    private int id;
+
 
     @JsonProperty("user_name")
     public String getUserName() {
@@ -88,14 +82,20 @@ public class User {
         this.email = email;
     }
 
-    @JsonIgnore
     public int getVotes() {
         return votes;
     }
 
-    @JsonIgnore
     public void setVotes(int votes) {
         this.votes = votes;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public UserDto toUserDto() {

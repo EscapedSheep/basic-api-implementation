@@ -1,15 +1,16 @@
 package com.thoughtworks.rslist.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.thoughtworks.rslist.dto.RsEventDto;
+import com.thoughtworks.rslist.dto.UserDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
+@Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -20,37 +21,21 @@ public class RsEvent {
     @NotNull
     private String keyWord;
 
-    @Valid
     @NotNull
-    private User user;
+    private int userId;
 
-    public String getEventName() {
-        return eventName;
-    }
+    private int rsEventId;
 
-    public void setEventName(String eventName) {
-        this.eventName = eventName;
-    }
-
-    public String getKeyWord() {
-        return keyWord;
-    }
-
-    public void setKeyWord(String keyWord) {
-        this.keyWord = keyWord;
+    public RsEventDto toRsEventDto(UserDto userDto) {
+        return RsEventDto.builder().eventName(eventName).keyWord(keyWord).userDto(userDto).build();
     }
 
     @JsonIgnore
-    public User getUser() {
-        return user;
+    public int getRsEventId() {
+        return rsEventId;
     }
 
-    @JsonProperty
-    public void setUser(User user) {
-        this.user = user;
-    }
-
-    public RsEventDto toRsEventDto() {
-        return RsEventDto.builder().eventName(eventName).keyWord(keyWord).userDto(user.toUserDto()).build();
+    public void setRsEventId(int rsEventId) {
+        this.rsEventId = rsEventId;
     }
 }
