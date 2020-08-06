@@ -1,6 +1,9 @@
 package com.thoughtworks.rslist.service;
 
 import com.thoughtworks.rslist.domain.User;
+import com.thoughtworks.rslist.dto.UserDto;
+import com.thoughtworks.rslist.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -9,27 +12,31 @@ import java.util.stream.Collectors;
 
 @Service
 public class UserServiceImpl implements UserService{
+    private UserRepository userRepository;
 
-    private List<User> userList;
-
-    public UserServiceImpl() {
-        userList = new ArrayList<>();
+    @Autowired
+    public UserServiceImpl(UserRepository userRepository) {
+        this.userRepository = userRepository;
     }
 
     @Override
     public int registerUser(User user) {
-        userList.add(user);
-        return userList.size() - 1;
+        UserDto userDto = userRepository.save(user.toUserDto());
+        return userDto.getId();
     }
 
     @Override
     public List<User> getUserList() {
-        return userList;
+        return userRepository.findAll().stream().map(userDto -> userDto.toUser()).collect(Collectors.toList());
     }
 
     @Override
-    public Boolean isUserRegistered(String name) {
-        List<User> filteredUser = userList.stream().filter(user -> user.getUserName().equals(name)).collect(Collectors.toList());
-        return filteredUser.size() > 0;
+    public Boolean isUserRegistered(int id) {
+        return userRepository.findById(id).isPresent();
+    }
+
+    @Override
+    public void deleteUser(int id) {
+        userRepository.deleteById(id);
     }
 }

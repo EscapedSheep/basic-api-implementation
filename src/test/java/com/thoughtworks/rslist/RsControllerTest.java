@@ -251,11 +251,11 @@ class RsControllerTest {
 
         mockMvc.perform(get("/users"))
                 .andExpect((jsonPath("$",hasSize(3))))
-                .andExpect(jsonPath("$[2].userName", is("new user")))
-                .andExpect(jsonPath("$[2].gender", is("female")))
-                .andExpect(jsonPath("$[2].age", is(99)))
-                .andExpect(jsonPath("$[2].phone", is("12345678901")))
-                .andExpect(jsonPath("$[2].email", is("a@b.com")))
+                .andExpect(jsonPath("$[2].user_name", is("new user")))
+                .andExpect(jsonPath("$[2].user_gender", is("female")))
+                .andExpect(jsonPath("$[2].user_age", is(99)))
+                .andExpect(jsonPath("$[2].user_phone", is("12345678901")))
+                .andExpect(jsonPath("$[2].user_email", is("a@b.com")))
                 .andExpect(status().isOk());
     }
 

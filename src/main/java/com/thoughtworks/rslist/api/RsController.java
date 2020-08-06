@@ -22,16 +22,18 @@ public class RsController {
 
   @GetMapping("/rs/{index}")
   public ResponseEntity getRsEvent(@PathVariable int index) {
-    if (index < 1 || index > rsService.getRsNumber())
+    if (index < 1 || index > rsService.getRsNumber()) {
       throw new InvalidIndexException();
+    }
     return ResponseEntity.ok(rsService.getRsEvent(index ));
   }
 
   @GetMapping("/rs/list")
   public ResponseEntity getRsEventBetween(@RequestParam(required = false) Integer start, @RequestParam(required = false) Integer end) {
     if (start != null && end != null) {
-      if (start < 1 || end > rsService.getRsNumber())
+      if (start < 1 || end > rsService.getRsNumber()) {
         throw new InvalidRequestParamException();
+      }
       return ResponseEntity.ok(rsService.getRsEventBetween(start, end));
     }
     return ResponseEntity.ok(rsService.getRsEventList());
@@ -45,16 +47,18 @@ public class RsController {
 
   @PutMapping("/rs/{index}")
   public ResponseEntity updateEvent(@RequestBody RsEvent rsEvent, @PathVariable int index) {
-    if (index < 1 || index > rsService.getRsNumber())
+    if (index < 1 || index > rsService.getRsNumber()) {
       throw new InvalidIndexException();
+    }
     rsService.updateRsEvent(rsEvent,index);
     return ResponseEntity.ok(null);
   }
 
   @DeleteMapping("rs/{index}")
   public ResponseEntity deleteRsEvent(@PathVariable int index) {
-    if (index < 1 || index > rsService.getRsNumber())
+    if (index < 1 || index > rsService.getRsNumber()) {
       throw new InvalidIndexException();
+    }
     rsService.deleteRsEvent(index);
     return ResponseEntity.ok(null);
   }

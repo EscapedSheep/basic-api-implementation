@@ -21,19 +21,16 @@ public class RsServiceImpl implements RsService{
         rsEventList = new ArrayList<>();
         User user = new User("xiaowang", "female", 19, "18888888888", "a@thoughtworks.com");
         userService.registerUser(user);
-        RsEvent event1 = new RsEvent("第一条事件", "无标签", user);
-        RsEvent event2 = new RsEvent("第二条事件", "无标签", user);
-        RsEvent event3 = new RsEvent("第三条事件", "无标签", user);
-        addRsEvent(event1);
-        addRsEvent(event2);
-        addRsEvent(event3);
+        RsEvent testEvent1 = new RsEvent("第一条事件", "无标签", user);
+        RsEvent testEvent2 = new RsEvent("第二条事件", "无标签", user);
+        RsEvent testEvent3 = new RsEvent("第三条事件", "无标签", user);
+        addRsEvent(testEvent1);
+        addRsEvent(testEvent2);
+        addRsEvent(testEvent3);
     }
 
     @Override
     public int addRsEvent(RsEvent rsEvent) {
-        User user = rsEvent.getUser();
-        if (!userService.isUserRegistered(user.getUserName()))
-            userService.registerUser(user);
         rsEventList.add(rsEvent);
         return rsEventList.size() -1;
 
@@ -59,10 +56,12 @@ public class RsServiceImpl implements RsService{
         RsEvent event = rsEventList.get(index - 1);
         String updateName = rsEvent.getEventName();
         String updateKeyWord = rsEvent.getKeyWord();
-        if (updateName != null)
+        if (updateName != null) {
             event.setEventName(rsEvent.getEventName());
-        if (updateKeyWord != null)
+        }
+        if (updateKeyWord != null) {
             event.setKeyWord(rsEvent.getKeyWord());
+        }
     }
 
     @Override

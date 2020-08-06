@@ -1,7 +1,17 @@
 package com.thoughtworks.rslist.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.thoughtworks.rslist.dto.UserDto;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
+
 import javax.validation.constraints.*;
 
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class User {
     @NotNull
     @Size(max=8)
@@ -33,6 +43,7 @@ public class User {
         this.votes = 10;
     }
 
+    @JsonProperty("user_name")
     public String getUserName() {
         return userName;
     }
@@ -41,6 +52,7 @@ public class User {
         this.userName = userName;
     }
 
+    @JsonProperty("user_gender")
     public String getGender() {
         return gender;
     }
@@ -49,6 +61,7 @@ public class User {
         this.gender = gender;
     }
 
+    @JsonProperty("user_age")
     public int getAge() {
         return age;
     }
@@ -57,6 +70,7 @@ public class User {
         this.age = age;
     }
 
+    @JsonProperty("user_phone")
     public String getPhone() {
         return phone;
     }
@@ -65,6 +79,7 @@ public class User {
         this.phone = phone;
     }
 
+    @JsonProperty("user_email")
     public String getEmail() {
         return email;
     }
@@ -73,11 +88,17 @@ public class User {
         this.email = email;
     }
 
+    @JsonIgnore
     public int getVotes() {
         return votes;
     }
 
+    @JsonIgnore
     public void setVotes(int votes) {
         this.votes = votes;
+    }
+
+    public UserDto toUserDto() {
+        return UserDto.builder().age(age).email(email).userName(userName).gender(gender).phone(phone).votes(votes).build();
     }
 }

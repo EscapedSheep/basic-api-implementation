@@ -3,6 +3,8 @@ package com.thoughtworks.rslist;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.thoughtworks.rslist.domain.User;
+import com.thoughtworks.rslist.dto.UserDto;
+import com.thoughtworks.rslist.repository.UserRepository;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -10,145 +12,158 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.List;
+
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @SpringBootTest
 @AutoConfigureMockMvc
 public class UserControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
-    @Order(1)
+    @Autowired
+    private UserRepository userRepository;
+
+    private ObjectMapper objectMapper;
+
+    private UserDto userDto;
+
+    private User user;
+
+    @BeforeEach
+    public void setUp(){
+        userRepository.deleteAll();
+        userDto = UserDto.builder().userName("xiaowang").age(19).email("a@b.com").phone("18888888888").gender("male").build();
+        userDto = userRepository.save(userDto);
+        objectMapper = new ObjectMapper();
+        user = User.builder().userName(userDto.getUserName()).age(userDto.getAge()).email(userDto.getEmail()).gender(userDto.getGender()).phone(userDto.getPhone()).build();
+
+    }
+
     @Test
     public void should_register_user() throws Exception {
-        User user = getTestUser();
-        String userJson = getUserJson(user);
+        user.setUserName("newUser");
+        String userJson = objectMapper.writeValueAsString(user);
         mockMvc.perform(post("/user").content(userJson).contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isCreated());
+                .andExpect(status().isCreated())
+                .andExpect(header().exists("index"));
+
+        List<UserDto> findUser = userRepository.findAll();
+        assertEquals(findUser.size(), 2);
+        assertEquals(userDto.getId(), findUser.get(0).getId());
+        assertEquals(userDto.getEmail(), findUser.get(0).getEmail());
+        assertEquals(userDto.getAge(), findUser.get(0).getAge());
+        assertEquals(userDto.getUserName(), findUser.get(0).getUserName());
+        assertEquals(userDto.getPhone(), findUser.get(0).getPhone());
+        assertEquals(user.getEmail(), findUser.get(1).getEmail());
+        assertEquals(user.getAge(), findUser.get(1).getAge());
+        assertEquals(user.getUserName(), findUser.get(1).getUserName());
+        assertEquals(user.getPhone(), findUser.get(1).getPhone());
     }
 
-    @Order(2)
     @Test
     public void name_should_not_null() throws Exception {
-        User user = getTestUser();
         user.setUserName(null);
-        String userJson = getUserJson(user);
+        String userJson = objectMapper.writeValueAsString(user);
         mockMvc.perform(post("/user").content(userJson).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
 
-    @Order(3)
     @Test
     public void name_length_should_not_over_8() throws Exception {
-        User user = getTestUser();
         user.setUserName("maidamaida66666");
-        String userJson = getUserJson(user);
+        String userJson = objectMapper.writeValueAsString(user);
         mockMvc.perform(post("/user").content(userJson).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
 
-    @Order(4)
     @Test
     public void gender_should_not_null() throws Exception {
-        User user = getTestUser();
         user.setGender(null);
-        String userJson = getUserJson(user);
+        String userJson = objectMapper.writeValueAsString(user);
         mockMvc.perform(post("/user").content(userJson).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
 
-    @Order(5)
     @Test
     public void age_should_greater_than_17() throws Exception {
-        User user = getTestUser();
         user.setAge(17);
-        String userJson = getUserJson(user);
+        String userJson = objectMapper.writeValueAsString(user);
         mockMvc.perform(post("/user").content(userJson).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
 
-    @Order(6)
     @Test
     public void age_should_not_over_100() throws Exception {
-        User user = getTestUser();
         user.setAge(101);
-        String userJson = getUserJson(user);
+        String userJson = objectMapper.writeValueAsString(user);
         mockMvc.perform(post("/user").content(userJson).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
 
-    @Order(7)
     @Test
     public void email_should_fit_email_format() throws Exception {
-        User user = getTestUser();
         user.setEmail("aaa");
-        String userJson = getUserJson(user);
+        String userJson = objectMapper.writeValueAsString(user);
         mockMvc.perform(post("/user").content(userJson).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
 
-    @Order(8)
     @Test
     public void phone_number_should_start_with_1() throws Exception {
-        User user = getTestUser();
         user.setPhone("21234567890");
-        String userJson = getUserJson(user);
+        String userJson = objectMapper.writeValueAsString(user);
         mockMvc.perform(post("/user").content(userJson).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
 
-    @Order(9)
     @Test
     public void phone_number_should_have_length_of_11() throws Exception {
-        User user = getTestUser();
         user.setPhone("123456");
-        String userJson = getUserJson(user);
+        String userJson = objectMapper.writeValueAsString(user);
         mockMvc.perform(post("/user").content(userJson).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
 
         user.setPhone("1234567890123456");
-        userJson = getUserJson(user);
+        userJson = objectMapper.writeValueAsString(user);
         mockMvc.perform(post("/user").content(userJson).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
 
-    @Order(10)
     @Test
     public void should_get_user_list() throws Exception {
         mockMvc.perform(get("/users"))
-                .andExpect(jsonPath("$", hasSize(2)))
-                .andExpect(jsonPath("$[1].userName",is("maida")))
-                .andExpect(jsonPath("$[1].gender",is("male")))
-                .andExpect(jsonPath("$[1].age",is(99)))
-                .andExpect(jsonPath("$[1].phone",is("18888888888")))
-                .andExpect(jsonPath("$[1].email",is("email@gmail.com")))
+                .andExpect(jsonPath("$", hasSize(1)))
+                .andExpect(jsonPath("$[0].user_name",is("xiaowang")))
+                .andExpect(jsonPath("$[0].user_gender",is("male")))
+                .andExpect(jsonPath("$[0].user_age",is(19)))
+                .andExpect(jsonPath("$[0].user_phone",is("18888888888")))
+                .andExpect(jsonPath("$[0].user_email",is("a@b.com")))
                 .andExpect(status().isOk());
     }
 
-    @Order(11)
     @Test
     public void should_return_invalid_user_error() throws Exception {
-        User user = getTestUser();
         user.setAge(10000);
-        String userJson = getUserJson(user);
+        String userJson = objectMapper.writeValueAsString(user);
         mockMvc.perform(post("/user").content(userJson).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.error", is("invalid user")))
                 .andExpect(status().isBadRequest());
     }
 
-    private User getTestUser() {
-        User user = new User("maida", "male", 99, "18888888888", "email@gmail.com");
-        return user;
-    }
+    @Test
+    public void should_delete_user() throws Exception {
+        int id = userDto.getId();
+        mockMvc.perform(delete("/user/" + id))
+                .andExpect(status().isOk());
+        List<UserDto> findUser = userRepository.findAll();
+        assertEquals(0,findUser.size());
 
-    private String getUserJson(User user) throws JsonProcessingException {
-        ObjectMapper mapper = new ObjectMapper();
-        return mapper.writeValueAsString(user);
+        userDto = userRepository.save(userDto);
     }
 }
