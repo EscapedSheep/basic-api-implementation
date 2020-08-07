@@ -21,11 +21,12 @@ public class RsEventDto {
 
     private String eventName;
     private String keyWord;
+    private int voteNum;
 
     @ManyToOne
     private UserDto userDto;
 
     public RsEvent toRsEvent() {
-        return RsEvent.builder().eventName(eventName).keyWord(keyWord).userId(userDto.getId()).rsEventId(id).build();
+        return RsEvent.builder().eventName(eventName).keyWord(keyWord).userId(userDto.getId()).rsEventId(id).voteNum(voteNum).build();
     }
 }

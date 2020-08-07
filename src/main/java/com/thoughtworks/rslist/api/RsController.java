@@ -13,7 +13,6 @@ import javax.validation.Valid;
 import java.util.List;
 
 @RestController
-@Validated
 public class RsController {
 
   private RsService rsService;
@@ -26,18 +25,12 @@ public class RsController {
   @GetMapping("/rs/{id}")
   public ResponseEntity getRsEvent(@PathVariable int id) {
     RsEvent rsEvent = rsService.getRsEvent(id);
-    if (rsEvent == null) {
-      throw new InvalidIndexException();
-    }
     return ResponseEntity.ok(rsEvent);
   }
 
   @GetMapping("/rs/list")
   public ResponseEntity<List<RsEvent>> getRsEventBetween(@RequestParam(required = false) Integer start, @RequestParam(required = false) Integer end) {
     if (start != null && end != null) {
-      if (start < 1 || end > rsService.getMaxId()) {
-        throw new InvalidRequestParamException();
-      }
       return ResponseEntity.ok(rsService.getRsEventBetween(start, end));
     }
     return ResponseEntity.ok(rsService.getRsEventList());
@@ -46,30 +39,17 @@ public class RsController {
   @PostMapping("/rs/event")
   public ResponseEntity addRsEvent(@RequestBody @Valid RsEvent rsEvent) {
     int id = rsService.addRsEvent(rsEvent);
-    if (id == -1) {
-      return ResponseEntity.badRequest().build();
-    }
-
     return ResponseEntity.created(null).header("id", String.valueOf(id)).build();
   }
 
   @PutMapping("/rs/{id}")
   public ResponseEntity updateEvent(@RequestBody RsEvent rsEvent, @PathVariable int id) {
-    if (id < 1 || id > rsService.getMaxId()) {
-      throw new InvalidIndexException();
-    }
-    int affectRow = rsService.updateRsEvent(rsEvent,id);
-    if (affectRow < 1) {
-      return ResponseEntity.badRequest().build();
-    }
+    rsService.updateRsEvent(rsEvent, id);
     return ResponseEntity.ok().build();
   }
 
   @DeleteMapping("rs/{id}")
   public ResponseEntity deleteRsEvent(@PathVariable int id) {
-    if (id < 1 || id > rsService.getMaxId()) {
-      throw new InvalidIndexException();
-    }
     rsService.deleteRsEvent(id);
     return ResponseEntity.ok().build();
   }

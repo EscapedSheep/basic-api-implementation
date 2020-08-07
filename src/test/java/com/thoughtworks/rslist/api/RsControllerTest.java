@@ -1,4 +1,4 @@
-package com.thoughtworks.rslist;
+package com.thoughtworks.rslist.api;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.thoughtworks.rslist.domain.RsEvent;
@@ -54,15 +54,19 @@ class RsControllerTest {
         objectMapper = new ObjectMapper();
         user = User.builder().userName("xiaowang").age(19).email("a@b.com").phone("18888888888").gender("male").votes(10).build();
         userDto = userRepository.save(user.toUserDto());
+
         rsEvent = RsEvent.builder().eventName("猪肉涨价啦").keyWord("经济").userId(userDto.getId()).build();
         secondRsEvent = RsEvent.builder().eventName("特朗普连任").keyWord("政治").userId(userDto.getId()).build();
         thirdRsEvent = RsEvent.builder().eventName("股票跌啦").keyWord("经济").userId(userDto.getId()).build();
+
         rsEventDto = rsEvent.toRsEventDto(userDto);
         secondRsEventDto = secondRsEvent.toRsEventDto(userDto);
         thirdRsEventDto = thirdRsEvent.toRsEventDto(userDto);
+
         rsEventDto = rsEventRepository.save(rsEventDto);
         secondRsEventDto = rsEventRepository.save(secondRsEventDto);
         thirdRsEventDto = rsEventRepository.save(thirdRsEventDto);
+
         rsEvent.setRsEventId(rsEventDto.getId());
         secondRsEvent.setRsEventId(secondRsEventDto.getId());
         thirdRsEvent.setRsEventId(thirdRsEventDto.getId());
@@ -295,7 +299,11 @@ class RsControllerTest {
                 .andExpect(jsonPath("$.error", is("invalid request param")))
                 .andExpect(status().isBadRequest());
 
-        mockMvc.perform(get("/rs/list?start=1&end=99999"))
+        mockMvc.perform(get("/rs/list?start=1&end=-1"))
+                .andExpect(jsonPath("$.error", is("invalid request param")))
+                .andExpect(status().isBadRequest());
+
+        mockMvc.perform(get("/rs/list?start=2&end=1"))
                 .andExpect(jsonPath("$.error", is("invalid request param")))
                 .andExpect(status().isBadRequest());
     }

@@ -32,6 +32,6 @@ public class UserDto {
     private List<RsEventDto> rsEventDto;
 
     public User toUser() {
-        return User.builder().age(age).email(email).userName(userName).gender(gender).phone(phone).votes(votes).build();
+        return User.builder().age(age).email(email).userName(userName).gender(gender).phone(phone).votes(votes).id(id).build();
     }
 }

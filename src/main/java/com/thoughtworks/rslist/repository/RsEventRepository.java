@@ -23,4 +23,9 @@ public interface RsEventRepository extends CrudRepository<RsEventDto, Integer> {
     int modifyKeyWordById(int id, String keyWord);
 
     List<RsEventDto> findAllByIdBetween(int start, int end);
+
+    @Transactional
+    @Modifying
+    @Query(value = "update RsEventDto r set r.voteNum = :voteNum where r.id = :id")
+    void modifyVoteById(int id, int voteNum);
 }

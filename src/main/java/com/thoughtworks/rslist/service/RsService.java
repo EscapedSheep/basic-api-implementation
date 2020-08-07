@@ -19,6 +19,4 @@ public interface RsService {
     public void deleteRsEvent(int id);
 
     public int getRsNumber();
-
-    public int getMaxId();
 }

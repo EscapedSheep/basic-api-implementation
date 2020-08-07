@@ -26,6 +26,8 @@ public class RsEvent {
 
     private int rsEventId;
 
+    private int voteNum;
+
     public RsEventDto toRsEventDto(UserDto userDto) {
         return RsEventDto.builder().eventName(eventName).keyWord(keyWord).userDto(userDto).build();
     }
