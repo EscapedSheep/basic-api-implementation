@@ -1,7 +1,5 @@
 package com.thoughtworks.rslist.api;
 
-import com.thoughtworks.rslist.Exception.InvalidIndexException;
-import com.thoughtworks.rslist.Exception.InvalidRequestParamException;
 import com.thoughtworks.rslist.domain.RsEvent;
 import com.thoughtworks.rslist.service.RsService;
 import org.springframework.beans.factory.annotation.Autowired;
