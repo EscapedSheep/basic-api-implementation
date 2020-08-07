@@ -21,8 +21,8 @@ public class UserController {
 
     @PostMapping("/user")
     public ResponseEntity registerUser(@RequestBody @Valid User user) {
-        int index = userService.registerUser(user);
-        return ResponseEntity.created(null).header("index", String.valueOf(index)).build();
+        int id = userService.registerUser(user);
+        return ResponseEntity.created(null).header("id", String.valueOf(id)).build();
     }
 
     @GetMapping("/user/{id}")

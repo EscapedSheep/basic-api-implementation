@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -43,7 +44,7 @@ public class RsController {
   }
 
   @PostMapping("/rs/event")
-  public ResponseEntity addRsEvent(@RequestBody RsEvent rsEvent) {
+  public ResponseEntity addRsEvent(@RequestBody @Valid RsEvent rsEvent) {
     int id = rsService.addRsEvent(rsEvent);
     if (id == -1) {
       return ResponseEntity.badRequest().build();
@@ -54,19 +55,22 @@ public class RsController {
 
   @PutMapping("/rs/{id}")
   public ResponseEntity updateEvent(@RequestBody RsEvent rsEvent, @PathVariable int id) {
+    if (id < 1 || id > rsService.getMaxId()) {
+      throw new InvalidIndexException();
+    }
     int affectRow = rsService.updateRsEvent(rsEvent,id);
     if (affectRow < 1) {
       return ResponseEntity.badRequest().build();
     }
-    return ResponseEntity.ok(null);
+    return ResponseEntity.ok().build();
   }
 
-  @DeleteMapping("rs/{index}")
-  public ResponseEntity deleteRsEvent(@PathVariable int index) {
-    if (index < 1 || index > rsService.getRsNumber()) {
+  @DeleteMapping("rs/{id}")
+  public ResponseEntity deleteRsEvent(@PathVariable int id) {
+    if (id < 1 || id > rsService.getMaxId()) {
       throw new InvalidIndexException();
     }
-    rsService.deleteRsEvent(index);
-    return ResponseEntity.ok(null);
+    rsService.deleteRsEvent(id);
+    return ResponseEntity.ok().build();
   }
 }

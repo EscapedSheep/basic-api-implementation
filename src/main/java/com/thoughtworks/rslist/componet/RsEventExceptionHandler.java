@@ -17,16 +17,11 @@ public class RsEventExceptionHandler {
     @ExceptionHandler({InvalidIndexException.class, MethodArgumentNotValidException.class, InvalidRequestParamException.class})
     public ResponseEntity handleException(Exception e) {
         String errorMessage;
-/*
         if(e instanceof MethodArgumentNotValidException) {
             errorMessage = "invalid param";
         } else {
             errorMessage = e.getMessage();
         }
-
-
- */
-        errorMessage = e.getMessage();
         Error error = new Error();
         error.setError(errorMessage);
         log.error(errorMessage);

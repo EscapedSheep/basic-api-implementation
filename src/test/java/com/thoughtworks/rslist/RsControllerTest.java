@@ -74,13 +74,13 @@ class RsControllerTest {
                 .andExpect(jsonPath("$", hasSize(3)))
                 .andExpect(jsonPath("$[0].eventName", is("猪肉涨价啦")))
                 .andExpect(jsonPath("$[0].keyWord",is("经济")))
-                .andExpect(jsonPath("$[0]", not(hasKey("user"))))
+                .andExpect(jsonPath("$[0].userId", is(rsEvent.getUserId())))
                 .andExpect(jsonPath("$[1].eventName", is("特朗普连任")))
                 .andExpect(jsonPath("$[1].keyWord",is("政治")))
-                .andExpect(jsonPath("$[1]", not(hasKey("user"))))
+                .andExpect(jsonPath("$[1].userId", is(secondRsEvent.getUserId())))
                 .andExpect(jsonPath("$[2].eventName", is("股票跌啦")))
                 .andExpect(jsonPath("$[2].keyWord",is("经济")))
-                .andExpect(jsonPath("$[2]", not(hasKey("user"))))
+                .andExpect(jsonPath("$[2].userId", is(thirdRsEvent.getUserId())))
                 .andExpect(status().isOk());
     }
 
@@ -90,7 +90,7 @@ class RsControllerTest {
         mockMvc.perform(get("/rs/" + id))
                 .andExpect(jsonPath("$.eventName",is("猪肉涨价啦")))
                 .andExpect(jsonPath("$.keyWord",is("经济")))
-                .andExpect(jsonPath("$", not(hasKey("user"))))
+                .andExpect(jsonPath("$.userId", is(rsEvent.getUserId())))
                 .andExpect(status().isOk());
     }
 
@@ -103,31 +103,31 @@ class RsControllerTest {
                 .andExpect(jsonPath("$", hasSize(2)))
                 .andExpect(jsonPath("$[0].eventName", is("猪肉涨价啦")))
                 .andExpect(jsonPath("$[0].keyWord",is("经济")))
-                .andExpect(jsonPath("$[0]", not(hasKey("user"))))
+                .andExpect(jsonPath("$[0].userId", is(rsEvent.getUserId())))
                 .andExpect(jsonPath("$[1].eventName", is("特朗普连任")))
                 .andExpect(jsonPath("$[1].keyWord",is("政治")))
-                .andExpect(jsonPath("$[1]", not(hasKey("user"))))
+                .andExpect(jsonPath("$[1].userId", is(secondRsEvent.getUserId())))
                 .andExpect(status().isOk());
         mockMvc.perform(get("/rs/list?start=" + secondIndex + "&end=" + thirdIndex))
                 .andExpect(jsonPath("$", hasSize(2)))
                 .andExpect(jsonPath("$[0].eventName", is("特朗普连任")))
                 .andExpect(jsonPath("$[0].keyWord",is("政治")))
-                .andExpect(jsonPath("$[0]", not(hasKey("user"))))
+                .andExpect(jsonPath("$[0].userId", is(secondRsEvent.getUserId())))
                 .andExpect(jsonPath("$[1].eventName", is("股票跌啦")))
                 .andExpect(jsonPath("$[1].keyWord",is("经济")))
-                .andExpect(jsonPath("$[1]", not(hasKey("user"))))
+                .andExpect(jsonPath("$[0].userId", is(thirdRsEvent.getUserId())))
                 .andExpect(status().isOk());
         mockMvc.perform(get("/rs/list?start=" + firstIndex + "&end=" + thirdIndex))
                 .andExpect(jsonPath("$", hasSize(3)))
                 .andExpect(jsonPath("$[0].eventName", is("猪肉涨价啦")))
                 .andExpect(jsonPath("$[0].keyWord",is("经济")))
-                .andExpect(jsonPath("$[0]", not(hasKey("user"))))
+                .andExpect(jsonPath("$[0].userId", is(rsEvent.getUserId())))
                 .andExpect(jsonPath("$[1].eventName", is("特朗普连任")))
                 .andExpect(jsonPath("$[1].keyWord",is("政治")))
-                .andExpect(jsonPath("$[1]", not(hasKey("user"))))
+                .andExpect(jsonPath("$[1].userId", is(secondRsEvent.getUserId())))
                 .andExpect(jsonPath("$[2].eventName", is("股票跌啦")))
                 .andExpect(jsonPath("$[2].keyWord",is("经济")))
-                .andExpect(jsonPath("$[2]", not(hasKey("user"))))
+                .andExpect(jsonPath("$[2].userId", is(thirdRsEvent.getUserId())))
                 .andExpect(status().isOk());
     }
 
@@ -137,7 +137,8 @@ class RsControllerTest {
         objectMapper.configure(USE_ANNOTATIONS, false);
         String jsonStr = objectMapper.writeValueAsString(rsEvent);
         mockMvc.perform(post("/rs/event").contentType(MediaType.APPLICATION_JSON).content(jsonStr))
-                .andExpect(status().isCreated());
+                .andExpect(status().isCreated())
+                .andExpect(header().exists("id"));
 
         List<RsEventDto> allRsEvent = rsEventRepository.findAll();
         assertNotNull(allRsEvent);
@@ -166,127 +167,109 @@ class RsControllerTest {
         assertEquals(rsEventDto.get().getEventName(), "Updated name");
     }
 
-    //TODO: refactor rsController test
     @Test
     public void should_update_rs_event_name() throws Exception {
-        String jsonStr = "{\"eventName\":\"特朗普连任\"}";
-        mockMvc.perform(put("/rs/1").content(jsonStr).contentType(MediaType.APPLICATION_JSON))
+        rsEvent.setKeyWord(null);
+        rsEvent.setEventName("updatedName");
+        String jsonStr = objectMapper.writeValueAsString(rsEvent);
+        mockMvc.perform(put("/rs/" + rsEvent.getRsEventId()).content(jsonStr).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
 
         mockMvc.perform(get("/rs/list"))
-                .andExpect(jsonPath("$", hasSize(4)))
-                .andExpect(jsonPath("$[0].eventName",is("特朗普连任")))
-                .andExpect(jsonPath("$[0].keyWord",is("无标签")))
-                .andExpect(jsonPath("$[0]", not(hasKey("user"))))
-                .andExpect(jsonPath("$[1].eventName",is("股票跌啦")))
-                .andExpect(jsonPath("$[1].keyWord",is("经济")))
-                .andExpect(jsonPath("$[1]", not(hasKey("user"))))
-                .andExpect(jsonPath("$[2].eventName",is("第三条事件")))
-                .andExpect(jsonPath("$[2].keyWord",is("无标签")))
-                .andExpect(jsonPath("$[2]", not(hasKey("user"))))
-                .andExpect(jsonPath("$[3].eventName",is("猪肉涨价啦")))
-                .andExpect(jsonPath("$[3].keyWord",is("经济")))
-                .andExpect(jsonPath("$[3]", not(hasKey("user"))))
+                .andExpect(jsonPath("$", hasSize(3)))
+                .andExpect(jsonPath("$[0].eventName", is("updatedName")))
+                .andExpect(jsonPath("$[0].keyWord",is("经济")))
+                .andExpect(jsonPath("$[0].userId", is(rsEvent.getUserId())))
+                .andExpect(jsonPath("$[1].eventName", is("特朗普连任")))
+                .andExpect(jsonPath("$[1].keyWord",is("政治")))
+                .andExpect(jsonPath("$[1].userId", is(secondRsEvent.getUserId())))
+                .andExpect(jsonPath("$[2].eventName", is("股票跌啦")))
+                .andExpect(jsonPath("$[2].keyWord",is("经济")))
+                .andExpect(jsonPath("$[2].userId", is(thirdRsEvent.getUserId())))
                 .andExpect(status().isOk());
 
     }
 
     @Test
     public void should_update_rs_event_key_word() throws Exception {
-        String jsonStr = "{\"keyWord\":\"政治\"}";
-        mockMvc.perform(put("/rs/1").content(jsonStr).contentType(MediaType.APPLICATION_JSON))
+        rsEvent.setEventName(null);
+        rsEvent.setKeyWord("updatedKeyWord");
+        String jsonStr = objectMapper.writeValueAsString(rsEvent);
+        mockMvc.perform(put("/rs/" + rsEvent.getRsEventId()).content(jsonStr).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
 
         mockMvc.perform(get("/rs/list"))
-                .andExpect(jsonPath("$", hasSize(4)))
-                .andExpect(jsonPath("$[0].eventName",is("特朗普连任")))
-                .andExpect(jsonPath("$[0].keyWord",is("政治")))
-                .andExpect(jsonPath("$[0]", not(hasKey("user"))))
-                .andExpect(jsonPath("$[1].eventName",is("股票跌啦")))
-                .andExpect(jsonPath("$[1].keyWord",is("经济")))
-                .andExpect(jsonPath("$[1]", not(hasKey("user"))))
-                .andExpect(jsonPath("$[2].eventName",is("第三条事件")))
-                .andExpect(jsonPath("$[2].keyWord",is("无标签")))
-                .andExpect(jsonPath("$[2]", not(hasKey("user"))))
-                .andExpect(jsonPath("$[3].eventName",is("猪肉涨价啦")))
-                .andExpect(jsonPath("$[3].keyWord",is("经济")))
-                .andExpect(jsonPath("$[3]", not(hasKey("user"))))
+                .andExpect(jsonPath("$", hasSize(3)))
+                .andExpect(jsonPath("$[0].eventName", is("猪肉涨价啦")))
+                .andExpect(jsonPath("$[0].keyWord",is("updatedKeyWord")))
+                .andExpect(jsonPath("$[0].userId", is(rsEvent.getUserId())))
+                .andExpect(jsonPath("$[1].eventName", is("特朗普连任")))
+                .andExpect(jsonPath("$[1].keyWord",is("政治")))
+                .andExpect(jsonPath("$[1].userId", is(secondRsEvent.getUserId())))
+                .andExpect(jsonPath("$[2].eventName", is("股票跌啦")))
+                .andExpect(jsonPath("$[2].keyWord",is("经济")))
+                .andExpect(jsonPath("$[2].userId", is(thirdRsEvent.getUserId())))
                 .andExpect(status().isOk());
     }
 
     @Test
     public void should_delete_rs_event() throws Exception {
         mockMvc.perform(get("/rs/list"))
-                .andExpect(jsonPath("$", hasSize(4)))
-                .andExpect(jsonPath("$[0].eventName",is("特朗普连任")))
-                .andExpect(jsonPath("$[0].keyWord",is("政治")))
-                .andExpect(jsonPath("$[0]", not(hasKey("user"))))
-                .andExpect(jsonPath("$[1].eventName",is("股票跌啦")))
-                .andExpect(jsonPath("$[1].keyWord",is("经济")))
-                .andExpect(jsonPath("$[1]", not(hasKey("user"))))
-                .andExpect(jsonPath("$[2].eventName",is("第三条事件")))
-                .andExpect(jsonPath("$[2].keyWord",is("无标签")))
-                .andExpect(jsonPath("$[2]", not(hasKey("user"))))
-                .andExpect(jsonPath("$[3].eventName",is("猪肉涨价啦")))
-                .andExpect(jsonPath("$[3].keyWord",is("经济")))
-                .andExpect(jsonPath("$[3]", not(hasKey("user"))))
+                .andExpect(jsonPath("$", hasSize(3)))
+                .andExpect(jsonPath("$[0].eventName", is("猪肉涨价啦")))
+                .andExpect(jsonPath("$[0].keyWord",is("经济")))
+                .andExpect(jsonPath("$[0].userId", is(rsEvent.getUserId())))
+                .andExpect(jsonPath("$[1].eventName", is("特朗普连任")))
+                .andExpect(jsonPath("$[1].keyWord",is("政治")))
+                .andExpect(jsonPath("$[1].userId", is(secondRsEvent.getUserId())))
+                .andExpect(jsonPath("$[2].eventName", is("股票跌啦")))
+                .andExpect(jsonPath("$[2].keyWord",is("经济")))
+                .andExpect(jsonPath("$[2].userId", is(thirdRsEvent.getUserId())))
                 .andExpect(status().isOk());
 
-        mockMvc.perform(delete("/rs/3")).andExpect(status().isOk());
+        mockMvc.perform(delete("/rs/" + thirdRsEvent.getRsEventId())).andExpect(status().isOk());
 
         mockMvc.perform(get("/rs/list"))
-                .andExpect(jsonPath("$", hasSize(3)))
-                .andExpect(jsonPath("$[0].eventName",is("特朗普连任")))
-                .andExpect(jsonPath("$[0].keyWord",is("政治")))
-                .andExpect(jsonPath("$[0]", not(hasKey("user"))))
-                .andExpect(jsonPath("$[1].eventName",is("股票跌啦")))
-                .andExpect(jsonPath("$[1].keyWord",is("经济")))
-                .andExpect(jsonPath("$[1]", not(hasKey("user"))))
-                .andExpect(jsonPath("$[2].eventName",is("猪肉涨价啦")))
-                .andExpect(jsonPath("$[2].keyWord",is("经济")))
-                .andExpect(jsonPath("$[2]", not(hasKey("user"))))
+                .andExpect(jsonPath("$", hasSize(2)))
+                .andExpect(jsonPath("$[0].eventName", is("猪肉涨价啦")))
+                .andExpect(jsonPath("$[0].keyWord",is("经济")))
+                .andExpect(jsonPath("$[0].userId", is(rsEvent.getUserId())))
+                .andExpect(jsonPath("$[1].eventName", is("特朗普连任")))
+                .andExpect(jsonPath("$[1].keyWord",is("政治")))
+                .andExpect(jsonPath("$[1].userId", is(secondRsEvent.getUserId())))
                 .andExpect(status().isOk());
     }
 
     @Test
-    public void rs_event_name_should_not_null() throws Exception {
-        String jsonStr = "{\"keyWord\": \"经济\", \"user\": {\"userName\": \"maida\", \"gender\": \"male\", \"age\": 19, \"phone\": \"18888888888\", \"email\": \"a@gmail.com\"}}";
-
+    public void rs_event_name_should_not_null_when_add_rs_event() throws Exception {
+        rsEvent.setEventName(null);
+        String jsonStr = objectMapper.writeValueAsString(rsEvent);
         mockMvc.perform(post("/rs/event").content(jsonStr).contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error", is("invalid param")));
     }
 
     @Test
     public void rs_event_key_word_should_not_null() throws Exception {
-        String jsonStr = "{\"eventName\": \"猪肉涨价啦\", \"user\": {\"userName\": \"maida\", \"gender\": \"male\", \"age\": 19, \"phone\": \"18888888888\", \"email\": \"a@gmail.com\"}}";
-
+        rsEvent.setKeyWord(null);
+        String jsonStr = objectMapper.writeValueAsString(rsEvent);
         mockMvc.perform(post("/rs/event").content(jsonStr).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
 
     @Test
-    public void rs_event_user_should_not_null() throws Exception {
+    public void rs_event_user_id_should_not_null() throws Exception {
         String jsonStr = "{\"eventName\": \"猪肉涨价啦\", \"keyWord\": \"经济\"}";
-
         mockMvc.perform(post("/rs/event").content(jsonStr).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
 
     @Test
-    public void should_register_user_when_add_rs_event_if_user_name_not_existed() throws Exception{
-        String jsonStr = "{\"eventName\": \"猪肉涨价啦\", \"keyWord\": \"经济\", \"user\": {\"userName\": \"new user\", \"gender\": \"female\", \"age\": 99, \"phone\": \"12345678901\", \"email\": \"a@b.com\"}}";
-
+    public void should_reject_add_rs_event_when_user_not_existed() throws Exception{
+        rsEvent.setUserId(9999);
+        String jsonStr = objectMapper.writeValueAsString(rsEvent);
         mockMvc.perform(post("/rs/event").content(jsonStr).contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isCreated());
-
-        mockMvc.perform(get("/users"))
-                .andExpect((jsonPath("$",hasSize(3))))
-                .andExpect(jsonPath("$[2].user_name", is("new user")))
-                .andExpect(jsonPath("$[2].user_gender", is("female")))
-                .andExpect(jsonPath("$[2].user_age", is(99)))
-                .andExpect(jsonPath("$[2].user_phone", is("12345678901")))
-                .andExpect(jsonPath("$[2].user_email", is("a@b.com")))
-                .andExpect(status().isOk());
+                .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -295,8 +278,8 @@ class RsControllerTest {
                 .andExpect(jsonPath("$.error", is("invalid index")))
                 .andExpect(status().isBadRequest());
 
-        String jsonStr = "{\"eventName\": \"猪肉涨价啦\", \"keyWord\": \"经济\", \"user\": {\"userName\": \"maida\", \"gender\": \"male\", \"age\": 19, \"phone\": \"18888888888\", \"email\": \"a@gmail.com\"}}";
-        mockMvc.perform(put("/rs/999999").content(jsonStr).contentType(MediaType.APPLICATION_JSON))
+        String jsonStr = objectMapper.writeValueAsString(rsEvent);
+        mockMvc.perform(put("/rs/99999999").content(jsonStr).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.error", is("invalid index")))
                 .andExpect(status().isBadRequest());
 
@@ -312,22 +295,8 @@ class RsControllerTest {
                 .andExpect(jsonPath("$.error", is("invalid request param")))
                 .andExpect(status().isBadRequest());
 
-        mockMvc.perform(get("/rs/list?start=1&end=999"))
+        mockMvc.perform(get("/rs/list?start=1&end=99999"))
                 .andExpect(jsonPath("$.error", is("invalid request param")))
                 .andExpect(status().isBadRequest());
     }
-
-    @Test
-    public void should_return_invalid_param_error() throws Exception {
-        String jsonStr = "{\"eventName\": \"猪肉涨价啦\", \"keyWord\": \"经济\", \"user\": {\"userName\": \"maidamaidadad\", \"gender\": \"male\", \"age\": 19, \"phone\": \"18888888888\", \"email\": \"a@gmail.com\"}}";
-
-        mockMvc.perform(post("/rs/event").content(jsonStr).contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.error", is("invalid param")))
-                .andExpect(status().isBadRequest());
-
-    }
-
-
-
-
 }
