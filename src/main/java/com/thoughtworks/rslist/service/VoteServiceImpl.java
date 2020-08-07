@@ -20,19 +20,14 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Service
 public class VoteServiceImpl implements VoteService {
+    @Autowired
     private VoteRepository voteRepository;
+    @Autowired
     private UserRepository userRepository;
+    @Autowired
     private RsEventRepository rsEventRepository;
     private final int pageSize = 5;
-
-    @Autowired
-    public VoteServiceImpl(VoteRepository voteRepository, UserRepository userRepository, RsEventRepository rsEventRepository) {
-        this.voteRepository = voteRepository;
-        this.userRepository = userRepository;
-        this.rsEventRepository = rsEventRepository;
-    }
 
 
     @Override

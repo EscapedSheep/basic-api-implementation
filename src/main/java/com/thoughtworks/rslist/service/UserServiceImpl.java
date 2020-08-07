@@ -4,19 +4,13 @@ import com.thoughtworks.rslist.domain.User;
 import com.thoughtworks.rslist.dto.UserDto;
 import com.thoughtworks.rslist.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Service
 public class UserServiceImpl implements UserService{
-    private UserRepository userRepository;
-
     @Autowired
-    public UserServiceImpl(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
+    private UserRepository userRepository;
 
     @Override
     public int registerUser(User user) {

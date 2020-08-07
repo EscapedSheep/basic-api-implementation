@@ -9,24 +9,26 @@ import com.thoughtworks.rslist.dto.UserDto;
 import com.thoughtworks.rslist.repository.RsEventRepository;
 import com.thoughtworks.rslist.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-@Service
 public class RsServiceImpl implements RsService{
 
+    @Autowired
     private RsEventRepository rsEventRepository;
 
+    @Autowired
     private UserRepository userRepository;
-
+/*
     @Autowired
     public RsServiceImpl(UserRepository userRepository, RsEventRepository rsEventRepository) {
         this.userRepository = userRepository;
         this.rsEventRepository = rsEventRepository;
     }
+
+ */
 
     @Override
     public int addRsEvent(RsEvent rsEvent) {
