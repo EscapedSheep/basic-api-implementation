@@ -26,10 +26,11 @@ public class RsEvent {
 
     private int rsEventId;
 
-    private int voteNum;
+    @Builder.Default
+    private int voteNum = 0;
 
     public RsEventDto toRsEventDto(UserDto userDto) {
-        return RsEventDto.builder().eventName(eventName).keyWord(keyWord).userDto(userDto).build();
+        return RsEventDto.builder().eventName(eventName).keyWord(keyWord).userDto(userDto).voteNum(voteNum).build();
     }
 
     @JsonIgnore

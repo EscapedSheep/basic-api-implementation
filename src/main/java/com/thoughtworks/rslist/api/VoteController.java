@@ -6,6 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -24,7 +26,18 @@ public class VoteController {
     }
 
     @GetMapping("/voteRecord")
-    public ResponseEntity<List<Vote>> getRsRecord(@RequestParam int userId, @RequestParam int rsEventId) {
-        return ResponseEntity.ok(voteService.getVoteRecord(userId,rsEventId));
+    public ResponseEntity<List<Vote>> getRsRecord(@RequestParam(required = false) Integer userId,
+                                                  @RequestParam(required = false) Integer rsEventId,
+                                                  @RequestParam(required = false) Integer pageIndex,
+                                                  @RequestParam(required = false) String start,
+                                                  @RequestParam(required = false) String end) {
+        List<Vote> result = new ArrayList<>();
+        if (userId != null && rsEventId != null && pageIndex != null) {
+            result = voteService.getVoteRecord(userId, rsEventId, pageIndex);
+        }
+        if (start != null && end != null) {
+            result = voteService.getVoteBetween(start, end);
+        }
+        return ResponseEntity.ok(result);
     }
 }

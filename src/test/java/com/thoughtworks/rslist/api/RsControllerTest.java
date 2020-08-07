@@ -79,12 +79,15 @@ class RsControllerTest {
                 .andExpect(jsonPath("$[0].eventName", is("猪肉涨价啦")))
                 .andExpect(jsonPath("$[0].keyWord",is("经济")))
                 .andExpect(jsonPath("$[0].userId", is(rsEvent.getUserId())))
+                .andExpect(jsonPath("$[0].voteNum", is(rsEvent.getVoteNum())))
                 .andExpect(jsonPath("$[1].eventName", is("特朗普连任")))
                 .andExpect(jsonPath("$[1].keyWord",is("政治")))
                 .andExpect(jsonPath("$[1].userId", is(secondRsEvent.getUserId())))
+                .andExpect(jsonPath("$[1].voteNum", is(secondRsEvent.getVoteNum())))
                 .andExpect(jsonPath("$[2].eventName", is("股票跌啦")))
                 .andExpect(jsonPath("$[2].keyWord",is("经济")))
                 .andExpect(jsonPath("$[2].userId", is(thirdRsEvent.getUserId())))
+                .andExpect(jsonPath("$[2].voteNum", is(thirdRsEvent.getVoteNum())))
                 .andExpect(status().isOk());
     }
 
@@ -95,6 +98,7 @@ class RsControllerTest {
                 .andExpect(jsonPath("$.eventName",is("猪肉涨价啦")))
                 .andExpect(jsonPath("$.keyWord",is("经济")))
                 .andExpect(jsonPath("$.userId", is(rsEvent.getUserId())))
+                .andExpect(jsonPath("$.voteNum", is(rsEvent.getVoteNum())))
                 .andExpect(status().isOk());
     }
 
@@ -108,30 +112,40 @@ class RsControllerTest {
                 .andExpect(jsonPath("$[0].eventName", is("猪肉涨价啦")))
                 .andExpect(jsonPath("$[0].keyWord",is("经济")))
                 .andExpect(jsonPath("$[0].userId", is(rsEvent.getUserId())))
+                .andExpect(jsonPath("$[0].voteNum", is(rsEvent.getVoteNum())))
                 .andExpect(jsonPath("$[1].eventName", is("特朗普连任")))
                 .andExpect(jsonPath("$[1].keyWord",is("政治")))
                 .andExpect(jsonPath("$[1].userId", is(secondRsEvent.getUserId())))
+                .andExpect(jsonPath("$[1].voteNum", is(secondRsEvent.getVoteNum())))
                 .andExpect(status().isOk());
+
         mockMvc.perform(get("/rs/list?start=" + secondIndex + "&end=" + thirdIndex))
                 .andExpect(jsonPath("$", hasSize(2)))
                 .andExpect(jsonPath("$[0].eventName", is("特朗普连任")))
                 .andExpect(jsonPath("$[0].keyWord",is("政治")))
                 .andExpect(jsonPath("$[0].userId", is(secondRsEvent.getUserId())))
+                .andExpect(jsonPath("$[0].voteNum", is(secondRsEvent.getVoteNum())))
                 .andExpect(jsonPath("$[1].eventName", is("股票跌啦")))
                 .andExpect(jsonPath("$[1].keyWord",is("经济")))
-                .andExpect(jsonPath("$[0].userId", is(thirdRsEvent.getUserId())))
+                .andExpect(jsonPath("$[1].userId", is(thirdRsEvent.getUserId())))
+                .andExpect(jsonPath("$[1].voteNum", is(thirdRsEvent.getVoteNum())))
+
                 .andExpect(status().isOk());
+
         mockMvc.perform(get("/rs/list?start=" + firstIndex + "&end=" + thirdIndex))
                 .andExpect(jsonPath("$", hasSize(3)))
                 .andExpect(jsonPath("$[0].eventName", is("猪肉涨价啦")))
                 .andExpect(jsonPath("$[0].keyWord",is("经济")))
                 .andExpect(jsonPath("$[0].userId", is(rsEvent.getUserId())))
+                .andExpect(jsonPath("$[0].voteNum", is(rsEvent.getVoteNum())))
                 .andExpect(jsonPath("$[1].eventName", is("特朗普连任")))
                 .andExpect(jsonPath("$[1].keyWord",is("政治")))
                 .andExpect(jsonPath("$[1].userId", is(secondRsEvent.getUserId())))
+                .andExpect(jsonPath("$[1].voteNum", is(secondRsEvent.getVoteNum())))
                 .andExpect(jsonPath("$[2].eventName", is("股票跌啦")))
                 .andExpect(jsonPath("$[2].keyWord",is("经济")))
                 .andExpect(jsonPath("$[2].userId", is(thirdRsEvent.getUserId())))
+                .andExpect(jsonPath("$[2].voteNum", is(thirdRsEvent.getVoteNum())))
                 .andExpect(status().isOk());
     }
 
@@ -184,12 +198,15 @@ class RsControllerTest {
                 .andExpect(jsonPath("$[0].eventName", is("updatedName")))
                 .andExpect(jsonPath("$[0].keyWord",is("经济")))
                 .andExpect(jsonPath("$[0].userId", is(rsEvent.getUserId())))
+                .andExpect(jsonPath("$[0].voteNum", is(rsEvent.getVoteNum())))
                 .andExpect(jsonPath("$[1].eventName", is("特朗普连任")))
                 .andExpect(jsonPath("$[1].keyWord",is("政治")))
                 .andExpect(jsonPath("$[1].userId", is(secondRsEvent.getUserId())))
+                .andExpect(jsonPath("$[1].voteNum", is(secondRsEvent.getVoteNum())))
                 .andExpect(jsonPath("$[2].eventName", is("股票跌啦")))
                 .andExpect(jsonPath("$[2].keyWord",is("经济")))
                 .andExpect(jsonPath("$[2].userId", is(thirdRsEvent.getUserId())))
+                .andExpect(jsonPath("$[2].voteNum", is(thirdRsEvent.getVoteNum())))
                 .andExpect(status().isOk());
 
     }
@@ -207,12 +224,15 @@ class RsControllerTest {
                 .andExpect(jsonPath("$[0].eventName", is("猪肉涨价啦")))
                 .andExpect(jsonPath("$[0].keyWord",is("updatedKeyWord")))
                 .andExpect(jsonPath("$[0].userId", is(rsEvent.getUserId())))
+                .andExpect(jsonPath("$[0].voteNum", is(rsEvent.getVoteNum())))
                 .andExpect(jsonPath("$[1].eventName", is("特朗普连任")))
                 .andExpect(jsonPath("$[1].keyWord",is("政治")))
                 .andExpect(jsonPath("$[1].userId", is(secondRsEvent.getUserId())))
+                .andExpect(jsonPath("$[1].voteNum", is(secondRsEvent.getVoteNum())))
                 .andExpect(jsonPath("$[2].eventName", is("股票跌啦")))
                 .andExpect(jsonPath("$[2].keyWord",is("经济")))
                 .andExpect(jsonPath("$[2].userId", is(thirdRsEvent.getUserId())))
+                .andExpect(jsonPath("$[2].voteNum", is(thirdRsEvent.getVoteNum())))
                 .andExpect(status().isOk());
     }
 
@@ -223,12 +243,15 @@ class RsControllerTest {
                 .andExpect(jsonPath("$[0].eventName", is("猪肉涨价啦")))
                 .andExpect(jsonPath("$[0].keyWord",is("经济")))
                 .andExpect(jsonPath("$[0].userId", is(rsEvent.getUserId())))
+                .andExpect(jsonPath("$[0].voteNum", is(rsEvent.getVoteNum())))
                 .andExpect(jsonPath("$[1].eventName", is("特朗普连任")))
                 .andExpect(jsonPath("$[1].keyWord",is("政治")))
                 .andExpect(jsonPath("$[1].userId", is(secondRsEvent.getUserId())))
+                .andExpect(jsonPath("$[1].voteNum", is(secondRsEvent.getVoteNum())))
                 .andExpect(jsonPath("$[2].eventName", is("股票跌啦")))
                 .andExpect(jsonPath("$[2].keyWord",is("经济")))
                 .andExpect(jsonPath("$[2].userId", is(thirdRsEvent.getUserId())))
+                .andExpect(jsonPath("$[2].voteNum", is(thirdRsEvent.getVoteNum())))
                 .andExpect(status().isOk());
 
         mockMvc.perform(delete("/rs/" + thirdRsEvent.getRsEventId())).andExpect(status().isOk());
@@ -238,9 +261,11 @@ class RsControllerTest {
                 .andExpect(jsonPath("$[0].eventName", is("猪肉涨价啦")))
                 .andExpect(jsonPath("$[0].keyWord",is("经济")))
                 .andExpect(jsonPath("$[0].userId", is(rsEvent.getUserId())))
+                .andExpect(jsonPath("$[0].voteNum", is(rsEvent.getVoteNum())))
                 .andExpect(jsonPath("$[1].eventName", is("特朗普连任")))
                 .andExpect(jsonPath("$[1].keyWord",is("政治")))
                 .andExpect(jsonPath("$[1].userId", is(secondRsEvent.getUserId())))
+                .andExpect(jsonPath("$[1].voteNum", is(secondRsEvent.getVoteNum())))
                 .andExpect(status().isOk());
     }
 
