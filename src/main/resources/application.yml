@@ -1,9 +1,1 @@
-Spring:
-  datasource:
-    url: jdbc:mysql://localhost:3306/rsSystem
-    username: root
-    password: MeepoGMD
-  jpa:
-    hibernate:
-      ddl-auto: create
 
