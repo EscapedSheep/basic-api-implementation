@@ -1,6 +1,8 @@
 package com.thoughtworks.rslist.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.thoughtworks.rslist.Exception.InvalidIndexException;
+import com.thoughtworks.rslist.Exception.UserNotExistedException;
 import com.thoughtworks.rslist.Exception.VoteNumberOverThanOwnException;
 import com.thoughtworks.rslist.domain.Vote;
 import com.thoughtworks.rslist.dto.RsEventDto;
@@ -18,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class VoteServiceImpl implements VoteService {
@@ -42,14 +45,24 @@ public class VoteServiceImpl implements VoteService {
     @Transactional
     @Override
     public int addVoteRecord(Vote vote, int rsEventId) {
-        UserDto userDto= userRepository.findById(vote.getUserId()).get();
-        RsEventDto rsEventDto = rsEventRepository.findById(rsEventId).get();
-        if (userDto.getVotes() < vote.getVoteNum()) {
+        Optional<UserDto> userDto = userRepository.findById(vote.getUserId());
+        Optional<RsEventDto> rsEventDto = rsEventRepository.findById(rsEventId);
+        if (!rsEventDto.isPresent()) {
+            throw new InvalidIndexException();
+        }
+        if (!userDto.isPresent()) {
+            throw new UserNotExistedException();
+        }
+        UserDto user = userDto.get();
+        RsEventDto rsEvent = rsEventDto.get();
+        if (user.getVotes() < vote.getVoteNum()) {
             throw new VoteNumberOverThanOwnException();
         }
-        int voteNum = rsEventDto.getVoteNum() + vote.getVoteNum();
-        rsEventRepository.modifyVoteById(rsEventId, voteNum);
-        VoteDto voteDtoSaved = voteRepository.save(vote.toVoteDto(rsEventDto, userDto));
+        user.setVotes(user.getVotes() - vote.getVoteNum());
+        rsEvent.setVoteNum(rsEvent.getVoteNum() + vote.getVoteNum());
+        rsEventRepository.save(rsEvent);
+        userRepository.save(user);
+        VoteDto voteDtoSaved = voteRepository.save(vote.toVoteDto(rsEvent, user));
         return voteDtoSaved.getId();
     }
 
